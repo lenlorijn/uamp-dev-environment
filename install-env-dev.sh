@@ -308,12 +308,7 @@ then
     sudo ln -s ../../mods-available/opcache.ini /etc/php5/cli/conf.d/05-opcache.ini
 fi
 
-if [ ! -L /etc/php5/cli/conf.d/10-pdo.ini ]
-then
-    sudo ln -s ../../mods-available/pdo.ini /etc/php5/cli/conf.d/10-pdo.ini
-fi
-
-for mod in curl gd intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug
+for mod in curl gd intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
 do
     if [ ! -L "/etc/php5/cli/conf.d/10-${mod}.ini" ]
     then
