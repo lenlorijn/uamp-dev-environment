@@ -439,7 +439,7 @@ then
     sudo ln -s ../../mods-available/opcache.ini /etc/php5/cli/conf.d/05-opcache.ini
 fi
 
-for mod in curl gd intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
+for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
 do
     if [ ! -L "/etc/php5/cli/conf.d/10-${mod}.ini" ]
     then
