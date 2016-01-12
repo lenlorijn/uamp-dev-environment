@@ -1,6 +1,6 @@
 # Installation
 
-Run ```curl -sS https://raw.githubusercontent.com/ksangers/uamp-dev-environment/master/install-env-dev.sh | sh [-s -- [options]]``` to install.
+Run ```curl -sS https://raw.githubusercontent.com/ksangers/uamp-dev-environment/master/install-env-dev.sh | sh -s -- [options]``` to install.
 
 Options:
 ```
