@@ -4,10 +4,30 @@ EXTRA_APPS=0
 EXTRA_THEME=0
 EXTRA_SHELL=0
 
+dev_install_print_usage() {
+cat << EOT
+Setup a local development environment.
+
+Usage: $0 [options]
+
+Options:
+  -h|--help   Show this help message
+  -fancy-zsh  Installs zsh with a bunch of extra\'s
+  -theme      Installs Numix circle theme
+  -apps       Installs extra apps like Gimp and MySQL Workbench
+EOT
+exit
+}
 while [ $# -ne 0 ]
 do
     arg="$1"
     case "$arg" in
+        -h)
+            dev_install_print_usage
+            ;;
+        --help)
+            dev_install_print_usage
+            ;;
         -fancy-zsh)
             EXTRA_SHELL=1
             ;;
