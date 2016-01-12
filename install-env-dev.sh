@@ -124,6 +124,7 @@ sudo apt-get --yes --force-yes install \
     php5-redis \
     php5-sybase \
     php5-tidy \
+    php5-xsl \
     php5-xdebug  \
     php-codesniffer \
     php-invoker \
