@@ -6,7 +6,7 @@ EXTRA_SHELL=0
 VERBOSE=/dev/null
 
 dev_install_print_usage() {
-cat << EOT
+    cat << EOT
 Setup a local development environment.
 
 Usage: $0 [options]
@@ -18,8 +18,14 @@ Options:
   -theme      Installs Numix circle theme
   -v          Shows verbose output
 EOT
-exit
+    exit
 }
+
+if [ `id -u` -eq 0 ]
+then
+    echo "This script may not be run as root."
+    dev_install_print_usage
+fi
 
 while [ $# -ne 0 ]
 do
@@ -157,6 +163,129 @@ sudo sed -ie 's/\(^hosts.*mdns4_minimal\) \(.*$\)/\1 wins \2/' /etc/nsswitch.con
 sudo sed -ie 's/\(wins\( wins\)*\)/wins/g' /etc/nsswitch.conf
 sudo sed -ie 's/\sdns//g' /etc/nsswitch.conf
 sudo sed -ie 's/files/files dns/g' /etc/nsswitch.conf
+
+if [ ! -f ~/.gitconfig ]
+then
+    echo Configuring git
+    echo Enter your name:
+    read GIT_NAME
+    echo Enter your email address:
+    read GIT_EMAIL
+
+    cat > ~/.gitconfig << EOT
+[user]
+name = $GIT NAME
+email = $GIT_EMAIL
+[alias]
+ci = commit
+co = checkout
+shame = blame
+[branch]
+autosetupmerge = true
+[core]
+autocrlf = input
+excludesfile = ~/.git-local/gitignore
+[push]
+default = matching
+[fetch]
+prune = true
+[remote "origin"]
+push = refs/heads/*:refs/heads/*
+push = refs/tags/*:refs/tags/*
+[init]
+templatedir = ~/.git-local/template
+EOT
+fi
+
+for dir in ~/.git-local ~/.git-local/hooks ~/.git-local/template ~/.git-local/template/hooks
+do
+    if [ ! -d $dir ]
+    then
+        mkdir $dir
+    fi
+done
+
+if [ ! -f ~/.gitignore ]
+then
+    echo Creating gitignore file
+    cat > ~/.gitignore << EOT
+/.idea
+/.rocketeer
+/vendor
+EOT
+fi
+
+if [ ! -f ~/.git-local/hooks/pre-commit ]
+then
+    echo Creating pre-commit hook file
+    cat > ~/.git-local/hooks/pre-commit << "EOT"
+#!/bin/bash
+#
+# Based on http://nrocco.github.io/2012/04/19/git-pre-commit-hook-for-PHP.html post
+# and https://gist.github.com/jpetitcolas/ce00feaf19d46bfd5691
+#
+# Do not forget to: chmod +x .git/hooks/pre-commit
+
+BAD_PHP_WORDS='var_dump|die|exit|ini_set|extract|__halt_compiler|eval'
+BAD_JS_WORDS='console.log'
+BAD_TWIG_WORDS='{{ dump(.*) }}'
+
+EXITCODE=0
+FILES=`git diff --cached --diff-filter=ACMRTUXB --name-only HEAD --`
+
+for FILE in $FILES ; do
+
+  if [ "${FILE:9:4}" = "core" ]; then
+    echo "CORE FILE EDITED!"
+    echo $FILE
+    EXITCODE=1
+  fi
+
+  if [ "${FILE##*.}" = "php" ]; then
+    # Run all php files through php -l and grep for `illegal` words
+    /usr/bin/php -l "$FILE" > /dev/null
+    if [ $? -gt 0 ]; then
+      EXITCODE=1
+    fi
+
+    /bin/grep -H -i -n -E "${BAD_PHP_WORDS}" $FILE
+    if [ $? -eq 0 ]; then
+      EXITCODE=1
+    fi
+  fi
+
+  if [ "${FILE##*.}" = "twig" ]; then
+    /bin/grep -H -i -n -E "${BAD_JS_WORDS}" $FILE
+    if [ $? -eq 0 ]; then
+      EXITCODE=1
+    fi
+  fi
+
+  if [ "${FILE##*.}" = "js" ]; then
+    /bin/grep -H -i -n -E "${BAD_TWIG_WORDS}" $FILE
+    if [ $? -eq 0 ]; then
+      EXITCODE=1
+    fi
+  fi
+done
+
+if [ $EXITCODE -gt 0 ]; then
+  echo
+  echo 'Fix the above erros or use:'
+  echo ' git commit -n'
+  echo
+fi
+
+exit $EXITCODE
+EOT
+    chmod +x ~/.git-local/hooks/pre-commit
+fi
+
+if [ ! -l ~/.git-local/template/hooks/pre-commit ]
+then
+    echo Creating pre-commit hook symlink
+    ln -s ~/.git-local/hooks/pre-commit ~/.git-local/template/hooks/pre-commit
+fi
 
 echo Increasing Inotify watches limit
 if [ `grep fs.inotify.max_user_watches /etc/sysctl.conf | wc -l` -eq "0" ]
