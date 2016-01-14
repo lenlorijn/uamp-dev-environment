@@ -107,6 +107,7 @@ sudo apt-get --yes --force-yes install \
     libnotify-bin \
     libnss-winbind \
     libsqlite3-dev \
+    lm-sensors \
     mysql-client \
     mysql-server \
     nodejs-legacy \
@@ -139,6 +140,7 @@ sudo apt-get --yes --force-yes install \
     php-pear \
     php-timer \
     phpunit \
+    psensor \
     python \
     python-pip \
     redis-server \
