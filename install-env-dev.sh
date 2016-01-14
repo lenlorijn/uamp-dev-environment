@@ -313,10 +313,11 @@ then
     sudo sed -ie "s#^\($(whoami).*:\)\([^:]*\)\$#\1$(which zsh)#g" /etc/passwd
     if [ -f ~/.zshrc ]
     then
-        if [ `grep 'alias php=' ~/.zshrc | wc -l` -eq "0" ]
-        then
-            echo "alias php='php -dzend_extension=xdebug.so'" >> ~/.zshrc
-        fi
+# xdebug is slow
+#        if [ `grep 'alias php=' ~/.zshrc | wc -l` -eq "0" ]
+#        then
+#            echo "alias php='php -dzend_extension=xdebug.so'" >> ~/.zshrc
+#        fi
 
         if [ `grep 'alias composer=' ~/.zshrc | wc -l` -eq "0" ]
         then
@@ -422,10 +423,13 @@ date.timezone = Europe/Amsterdam
 
 [Xdebug]
 xdebug.remote_enable=1
+xdebug.remote_autostart=0
+xdebug.remote_host=localhost
 xdebug.remote_port=9000
-xdebug.profiler_enable=1
+xdebug.profiler_enable=0
 xdebug.profiler_output_dir=/tmp
 xdebug.max_nesting_level=1000
+xdebug.coverage_enable=0
 EOF
 fi
 
@@ -441,7 +445,9 @@ then
     sudo ln -s ../../mods-available/opcache.ini /etc/php5/cli/conf.d/05-opcache.ini
 fi
 
-for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
+# xdebug is slow
+# for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
+for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xsl
 do
     if [ ! -L "/etc/php5/cli/conf.d/10-${mod}.ini" ]
     then
@@ -452,7 +458,7 @@ done
 sudo cp -a /etc/php5/cli/conf.d/* /etc/php5/apache2/conf.d/
 
 # Remove xdebug from CLI because of issues with composer, resolving this via aliases
-sudo rm /etc/php5/cli/conf.d/10-xdebug.ini
+#sudo rm /etc/php5/cli/conf.d/10-xdebug.ini
 
 echo Configuring mysql
 if [ ! -f /etc/mysql/mysql.conf.d/ZZ-mysqld.cnf ]
