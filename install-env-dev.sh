@@ -337,6 +337,7 @@ max_allowed_packet = 32M
 innodb_buffer_pool_size=1600M
 ft_min_word_len=3
 ft_boolean_syntax=' |-><()~*:""&^'
+innodb_log_file_size = 128M
 EOT
     sudo service mysql restart > $VERBOSE
 fi
