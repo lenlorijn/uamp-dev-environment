@@ -326,7 +326,7 @@ then
 
         if [ `grep 'alias phpunit=' ~/.zshrc | wc -l` -eq "0" ]
         then
-            echo "alias phpunit='php \$(which phpunit)'" >> ~/.zshrc
+            echo "alias phpunit='php \$(which phpunit)' -dzend_extension=xdebug.so'" >> ~/.zshrc
         fi
         if [ ! -d ~/lib ]
         then
@@ -405,8 +405,6 @@ EOF
 fi
 
 echo Configuring PHP
-if [ ! -f /etc/php5/mods-available/custom.ini ]
-then
     sudo sh -c 'cat > /etc/php5/mods-available/custom.ini' << EOF
 [PHP]
 short_open_tag = On
@@ -429,9 +427,8 @@ xdebug.remote_port=9000
 xdebug.profiler_enable=0
 xdebug.profiler_output_dir=/tmp
 xdebug.max_nesting_level=1000
-xdebug.coverage_enable=0
+xdebug.coverage_enable=1
 EOF
-fi
 
 sudo rm /etc/php5/cli/conf.d/* /etc/php5/apache2/conf.d/*
 
