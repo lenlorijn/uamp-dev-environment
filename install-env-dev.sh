@@ -140,7 +140,6 @@ sudo apt-get --yes --force-yes install \
     php-pear \
     php-timer \
     phpunit \
-    psensor \
     python \
     python-pip \
     redis-server \
