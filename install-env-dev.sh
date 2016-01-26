@@ -100,6 +100,7 @@ sudo apt-get --yes --force-yes install \
     curl \
     dos2unix \
     dpkg-dev \
+    easy-rsa \
     git \
     git-flow \
     google-chrome-stable \
@@ -113,6 +114,7 @@ sudo apt-get --yes --force-yes install \
     nodejs-legacy \
     npm \
     oracle-java8-installer \
+    openvpn \
     php5 \
     php5-cli \
     php5-common \
