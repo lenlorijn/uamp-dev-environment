@@ -111,6 +111,7 @@ sudo apt-get --yes --force-yes install \
     lm-sensors \
     mysql-client \
     mysql-server \
+    network-manager-openvpn \
     nodejs-legacy \
     npm \
     oracle-java8-installer \
