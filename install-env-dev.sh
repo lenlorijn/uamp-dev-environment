@@ -3,6 +3,7 @@
 EXTRA_APPS=0
 EXTRA_THEME=0
 EXTRA_SHELL=0
+EXTRA_BTSEC=0
 VERBOSE=/dev/null
 
 dev_install_print_usage() {
@@ -46,6 +47,9 @@ do
         -theme)
             EXTRA_THEME=1
             ;;
+        -bluetooth-security)
+            EXTRA_BTSEC=1
+            ;;
         -v)
             VERBOSE=/dev/stdout
             ;;
@@ -73,6 +77,11 @@ if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]
 then
     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -  > $VERBOSE
     sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
+fi
+
+if [ "$EXTRA_BTSEC" -eq "1" ]
+then
+    sudo add-apt-repository --yes ppa:fixnix/indicator-systemtray-unity
 fi
 
 # WebUpd8 for Oracle java
@@ -111,6 +120,7 @@ sudo apt-get --yes --force-yes install \
     lm-sensors \
     mysql-client \
     mysql-server \
+    mtpfs \
     network-manager-openvpn \
     nodejs-legacy \
     npm \
@@ -527,11 +537,29 @@ then
     git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd > $VERBOSE 2>&1
 fi
 
+if [ "$EXTRA_BTSEC" -eq "1" ]
+then
+    sudo apt-get install --yes --force-yes install indicator-systemtray-unity blueproximity > $VERBOSE
+fi
+
+
+echo Setting pretty hostname
+sudo sh -c 'cat > /etc/machine-info' << EOT
+PRETTY_HOSTNAME=$(hostname)
+EOT
+sudo hciconfig hci0 name $(hostname)
+
 echo Disabling services
 for service in samba smbd nmbd
 do
     sudo update-rc.d $service remove
     sudo service $service stop
+done
+
+echo Restarting services
+for service in bluetooth
+do
+    sudo service $service restart
 done
 
 echo Cleaning up installation
