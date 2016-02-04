@@ -527,6 +527,13 @@ then
     git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd > $VERBOSE 2>&1
 fi
 
+echo Disabling services
+for service in samba smbd nmbd
+do
+    sudo update-rc.d $service remove
+    sudo service $service stop
+done
+
 echo Cleaning up installation
 
 sudo apt-get autoclean --yes > $VERBOSE
