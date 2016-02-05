@@ -513,14 +513,14 @@ then
     mkdir -p ~/.n98-magerun/modules/
 fi
 
-if [ ! -d ~/.n98-magerun/modules/mct-dev-tools ]
-then
-    echo Installing n98 module: mediact/mct-dev-tools
-    git clone git@mediact.git.beanstalkapp.com:/mediact/mct-dev-tools.git ~/.n98-magerun/modules/mct-dev-tools > $VERBOSE 2>&1
-    cd ~/.n98-magerun/modules/mct-dev-tools
-    make composer.lock > $VERBOSE 2>&1
-    cd - > /dev/null
-fi
+#if [ ! -d ~/.n98-magerun/modules/mct-dev-tools ]
+#then
+#    echo Installing n98 module: mediact/mct-dev-tools
+#    git clone git@mediact.git.beanstalkapp.com:/mediact/mct-dev-tools.git ~/.n98-magerun/modules/mct-dev-tools > $VERBOSE 2>&1
+#    cd ~/.n98-magerun/modules/mct-dev-tools
+#    make composer.lock > $VERBOSE 2>&1
+#    cd - > /dev/null
+#fi
 
 if [ ! -d ~/.n98-magerun/modules/environment ]
 then
