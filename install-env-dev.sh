@@ -113,6 +113,7 @@ sudo apt-get --yes --force-yes install \
     git \
     git-flow \
     google-chrome-stable \
+    iptables-persistent \
     libapache2-mod-php5 \
     libnotify-bin \
     libnss-winbind \
