@@ -100,11 +100,14 @@ sudo apt-get --yes dist-upgrade > $VERBOSE
 
 echo Installing software
 
-sudo sh -c 'debconf-set-selections << "mysql-server mysql-server/root_password password "' > $VERBOSE
-sudo sh -c 'debconf-set-selections << "mysql-server mysql-server/root_password_again password "' > $VERBOSE
+echo "mysql-server mysql-server/root_password password" | sudo debconf-set-selections
+echo "mysql-server mysql-server/root_password_again password" | sudo debconf-set-selections
 
-sudo sh -c 'echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections' > $VERBOSE
-sudo sh -c 'echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections' > $VERBOSE
+echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 
 sudo apt-get --yes --force-yes install \
     apache2 \
