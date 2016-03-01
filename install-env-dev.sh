@@ -302,7 +302,7 @@ EOT
     chmod +x ~/.git-local/hooks/pre-commit
 fi
 
-if [ ! -l ~/.git-local/template/hooks/pre-commit ]
+if [ ! -L ~/.git-local/template/hooks/pre-commit ]
 then
     echo Creating pre-commit hook symlink
     ln -s ~/.git-local/hooks/pre-commit ~/.git-local/template/hooks/pre-commit
@@ -554,7 +554,9 @@ echo Setting pretty hostname
 sudo sh -c 'cat > /etc/machine-info' << EOT
 PRETTY_HOSTNAME=$(hostname)
 EOT
-sudo hciconfig hci0 name $(hostname)
+sudo rfkill unblock bluetooth > $VERBOSE
+sudo service bluetooth start > $VERBOSE
+sudo hciconfig hci0 name $(hostname) > $VERBOSE
 
 echo Disabling services
 for service in samba smbd nmbd
