@@ -100,8 +100,14 @@ sudo apt-get --yes dist-upgrade > $VERBOSE
 
 echo Installing software
 
-sudo sh -c 'debconf-set-selections << "mysql-server mysql-server/root_password password "' > $VERBOSE
-sudo sh -c 'debconf-set-selections << "mysql-server mysql-server/root_password_again password "' > $VERBOSE
+echo "mysql-server mysql-server/root_password password" | sudo debconf-set-selections
+echo "mysql-server mysql-server/root_password_again password" | sudo debconf-set-selections
+
+echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 
 sudo apt-get --yes --force-yes install \
     apache2 \
@@ -296,7 +302,7 @@ EOT
     chmod +x ~/.git-local/hooks/pre-commit
 fi
 
-if [ ! -l ~/.git-local/template/hooks/pre-commit ]
+if [ ! -L ~/.git-local/template/hooks/pre-commit ]
 then
     echo Creating pre-commit hook symlink
     ln -s ~/.git-local/hooks/pre-commit ~/.git-local/template/hooks/pre-commit
@@ -488,12 +494,40 @@ fi
 echo Configuring apache
 sudo sed -ie "s/www-data/${USER}/g" /etc/apache2/envvars
 
-for mod in rewrite alias auth_basic autoindex dir env filter headers ssl status mime deflate php5 negotiation mpm_prefork setenvif
+for mod in rewrite alias auth_basic autoindex dir env filter headers ssl status mime deflate php5 negotiation mpm_prefork setenvif vhost_alias
 do
     sudo a2enmod $mod > $VERBOSE 2>&1
 done
 
-sudo sed -ie 's/Listen\s*\(.*:\)\([0-9]*\)$/Listen 127.0.0.1:\2/g' /etc/apache2/ports.conf
+sudo sed -ie 's/Listen\s*\(.*:\|\)\([0-9]*\)$/Listen 127.0.0.1:\2/g' /etc/apache2/ports.conf
+sudo service apache2 stop
+sudo sh -c 'cat > /etc/apache2/sites-available/_wildcard_.dev.mediacthq.nl.conf' << EOF
+ServerAdmin admin@example.com
+AddDefaultCharset UTF-8
+
+<Directory "/home/${USER}/www/">
+        Options Indexes FollowSymLinks
+        AllowOverride all
+        Require all granted
+</Directory>
+
+<VirtualHost *:80>
+    ServerName *.dev.mediacthq.nl
+    VirtualDocumentRoot /home/${USER}/www/%-4+
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName *.dev.mediacthq.nl
+    VirtualDocumentRoot /home/${USER}/www/%-4+
+    SSLEngine on
+    SSLProtocol all
+    SSLCertificateFile /home/${USER}/ssl/Subdomain.dev.mediacthq.nl.crt
+    SSLCertificateKeyFile /home/${USER}/ssl/Subdomain.dev.mediacthq.nl.key
+    SSLCACertificateFile /home/${USER}/ssl/Essential.ca-bundle
+</VirtualHost>
+EOF
+sudo sh -c 'ln -s /etc/apache2/sites-available/_wildcard_.dev.mediacthq.nl.conf /etc/apache2/sites-enabled/_wildcard_.dev.mediacthq.nl.conf' > $VERBOSE 2>&1
+echo NOTE: run sudo service apache2 start after adding key and certificate files to /home/${USER}/cert/
 
 echo Installing composer
 if [ ! -f ~/bin/composer.phar ]
@@ -548,7 +582,9 @@ echo Setting pretty hostname
 sudo sh -c 'cat > /etc/machine-info' << EOT
 PRETTY_HOSTNAME=$(hostname)
 EOT
-sudo hciconfig hci0 name $(hostname)
+sudo rfkill unblock bluetooth > $VERBOSE
+sudo service bluetooth restart > $VERBOSE
+sudo hciconfig hci0 name $(hostname) > $VERBOSE 2>&1
 
 echo Disabling services
 for service in samba smbd nmbd
