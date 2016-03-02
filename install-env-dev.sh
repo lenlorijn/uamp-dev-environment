@@ -499,7 +499,7 @@ do
     sudo a2enmod $mod > $VERBOSE 2>&1
 done
 
-sudo sed -ie 's/Listen\s*\(.*:\)\([0-9]*\)$/Listen 127.0.0.1:\2/g' /etc/apache2/ports.conf
+sudo sed -ie 's/Listen\s*\(.*:\|\)\([0-9]*\)$/Listen 127.0.0.1:\2/g' /etc/apache2/ports.conf
 
 echo Installing composer
 if [ ! -f ~/bin/composer.phar ]
