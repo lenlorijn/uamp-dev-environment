@@ -499,13 +499,36 @@ do
     sudo a2enmod $mod > $VERBOSE 2>&1
 done
 
+for dir in private certs
+do
+    if [ ! -d ~/lib/ssl/$dir ]
+    then
+        mkdir -p ~/lib/ssl/$dir
+    fi
+done
+
+if [ ! -d ~/workspace/dev.mediacthq.nl ]
+then
+    mkdir ~/workspace/dev.mediacthq.nl
+fi
+
+for file in ~/lib/ssl/private/_wildcard_.dev.mediacthq.nl.key ~/lib/ssl/certs/_wildcard_.dev.mediacthq.nl.crt ~/lib/ssl/certs/Essential.ca-bundle
+do
+    if [ ! -f $file ]
+    then
+        echo WARNING! $file not found. Download this from: https://wiki.mediact.nl/Ssl_dev.mediacthq.nl
+    fi
+done
+
 sudo sed -ie 's/Listen\s*\(.*:\|\)\([0-9]*\)$/Listen 127.0.0.1:\2/g' /etc/apache2/ports.conf
-sudo service apache2 stop
-sudo sh -c 'cat > /etc/apache2/sites-available/_wildcard_.dev.mediacthq.nl.conf' << EOF
-ServerAdmin admin@example.com
+
+if [ ! -f /etc/apache2/sites-available/_wildcard_.dev.mediacthq.nl.conf ]
+then
+    sudo sh -c 'cat > /etc/apache2/sites-available/_wildcard_.dev.mediacthq.nl.conf' << EOF
+ServerAdmin ${USER}@localhost
 AddDefaultCharset UTF-8
 
-<Directory "/home/${USER}/www/">
+<Directory "/home/${USER}/workspace/dev.mediacthq.nl/">
         Options Indexes FollowSymLinks
         AllowOverride all
         Require all granted
@@ -523,13 +546,14 @@ AddDefaultCharset UTF-8
     VirtualDocumentRoot /home/${USER}/www/%-4+
     SSLEngine on
     SSLProtocol all
-    SSLCertificateFile /home/${USER}/ssl/Subdomain.dev.mediacthq.nl.crt
-    SSLCertificateKeyFile /home/${USER}/ssl/Subdomain.dev.mediacthq.nl.key
-    SSLCACertificateFile /home/${USER}/ssl/Essential.ca-bundle
+    SSLCertificateKeyFile /home/${USER}/lib/ssl/private/_wildcard_.dev.mediacthq.nl.key
+    SSLCertificateFile /home/${USER}/lib/ssl/certs/_wildcard_.dev.mediacthq.nl.crt
+    SSLCACertificateFile /home/${USER}/lib/ssl/certs/Essential.ca-bundle
 </VirtualHost>
 EOF
-sudo sh -c 'ln -s /etc/apache2/sites-available/_wildcard_.dev.mediacthq.nl.conf /etc/apache2/sites-enabled/_wildcard_.dev.mediacthq.nl.conf' > $VERBOSE 2>&1
-echo NOTE: run sudo service apache2 start after adding key and certificate files to /home/${USER}/cert/
+fi
+
+sudo a2ensite _wildcard_.dev.mediacthq.nl.conf > $VERBOSE 2>&1
 
 echo Installing composer
 if [ ! -f ~/bin/composer.phar ]
