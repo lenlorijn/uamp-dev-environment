@@ -535,13 +535,15 @@ AddDefaultCharset UTF-8
 </Directory>
 
 <VirtualHost *:80>
-    ServerName *.dev.mediacthq.nl
-    VirtualDocumentRoot /home/${USER}/workspace/dev.mediacthq.nl/%-4+
+    ServerName dev.mediacthq.nl
+    ServerAlias *.dev.mediacthq.nl
+    VirtualDocumentRoot /home/${USER}/www/%-4+
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName *.dev.mediacthq.nl
-    VirtualDocumentRoot /home/${USER}/workspace/dev.mediacthq.nl/%-4+
+    ServerName dev.mediacthq.nl
+    ServerAlias *.dev.mediacthq.nl
+    VirtualDocumentRoot /home/${USER}/www/%-4+
     SSLEngine on
     SSLProtocol all
     SSLCertificateKeyFile /home/${USER}/lib/ssl/private/_wildcard_.dev.mediacthq.nl.key
