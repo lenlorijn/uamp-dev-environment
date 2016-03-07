@@ -354,7 +354,7 @@ then
         fi
         if [ ! -d ~/lib/powerline-shell ]
         then
-            git clone //github.com/milkbikis/powerline-shell.git ~/lib/powerline-shell > $VERBOSE 2>&1
+            git clone https://github.com/milkbikis/powerline-shell.git ~/lib/powerline-shell > $VERBOSE 2>&1
             cd ~/lib/powerline-shell
             cat > config.py << EOF
 SEGMENTS = [
@@ -372,7 +372,9 @@ EOF
         fi
         sed -ie 's/^plugins=(.*)/plugins=(git composer cp git-flow heroku rsync redis-cli z n98-magerun)/' ~/.zshrc
         sed -ie 's/^ZSH_THEME=.*$/ZSH_THEME="agnoster"/g' ~/.zshrc
-        cat >> ~/.zshrc <<"EOT"
+        if [ `grep 'function powerline_precmd' ~/.zshrc | wc -l` -eq "0" ]
+        then
+            cat >> ~/.zshrc <<"EOT"
 function powerline_precmd() {
     export PS1="$(~/lib/powerline-shell/powerline-shell.py $? --shell zsh 2> /dev/null)"
 }
@@ -388,6 +390,7 @@ function install_powerline_precmd() {
 
 install_powerline_precmd
 EOT
+        fi
     fi
 fi
 
