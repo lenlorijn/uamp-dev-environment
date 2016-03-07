@@ -343,10 +343,6 @@ then
             echo "alias composer='composer.phar'" >> ~/.zshrc
         fi
 
-        if [ `grep 'alias phpunit=' ~/.zshrc | wc -l` -eq "0" ]
-        then
-            echo "alias phpunit='php \$(which phpunit) -dzend_extension=xdebug.so'" >> ~/.zshrc
-        fi
         if [ ! -d ~/lib ]
         then
             mkdir ~/lib
