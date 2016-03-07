@@ -345,7 +345,7 @@ then
 
         if [ `grep 'alias phpunit=' ~/.zshrc | wc -l` -eq "0" ]
         then
-            echo "alias phpunit='php \$(which phpunit)' -dzend_extension=xdebug.so'" >> ~/.zshrc
+            echo "alias phpunit='php \$(which phpunit) -dzend_extension=xdebug.so'" >> ~/.zshrc
         fi
         if [ ! -d ~/lib ]
         then
