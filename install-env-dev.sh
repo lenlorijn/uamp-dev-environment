@@ -66,7 +66,7 @@ for dir in bin
 do
     if [ ! -d ~/$dir ]
     then
-        mkdir ~/$dir
+        mkdir -p ~/$dir
     fi
 done
 
@@ -222,7 +222,7 @@ for dir in ~/.git-local ~/.git-local/hooks ~/.git-local/template ~/.git-local/te
 do
     if [ ! -d $dir ]
     then
-        mkdir $dir
+        mkdir -p $dir
     fi
 done
 
@@ -509,7 +509,7 @@ done
 
 if [ ! -d ~/workspace/dev.mediacthq.nl ]
 then
-    mkdir ~/workspace/dev.mediacthq.nl
+    mkdir -p ~/workspace/dev.mediacthq.nl
 fi
 
 for file in ~/lib/ssl/private/_wildcard_.dev.mediacthq.nl.key ~/lib/ssl/certs/_wildcard_.dev.mediacthq.nl.crt ~/lib/ssl/certs/Essential.ca-bundle
