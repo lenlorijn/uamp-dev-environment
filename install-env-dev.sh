@@ -340,7 +340,7 @@ then
 
         if [ `grep 'alias phpunit=' ~/.zshrc | wc -l` -eq "0" ]
         then
-            echo "alias phpunit='php -d zend_extension=xdebug.so \$(which phpunit)'" >> ~/.zshrc
+            echo "alias phpunit='php -d zend_extension=xdebug.so \$(/bin/which phpunit)'" >> ~/.zshrc
         fi
 
         if [ `grep 'alias composer=' ~/.zshrc | wc -l` -eq "0" ]
