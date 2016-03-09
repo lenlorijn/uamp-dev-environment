@@ -338,6 +338,11 @@ then
 #            echo "alias php='php -dzend_extension=xdebug.so'" >> ~/.zshrc
 #        fi
 
+        if [ `grep 'alias phpunit=' ~/.zshrc | wc -l` -eq "0" ]
+        then
+            echo "alias phpunit='php -d zend_extension=xdebug.so \$(which phpunit)'" >> ~/.zshrc
+        fi
+
         if [ `grep 'alias composer=' ~/.zshrc | wc -l` -eq "0" ]
         then
             echo "alias composer='composer.phar'" >> ~/.zshrc
