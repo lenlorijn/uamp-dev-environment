@@ -112,6 +112,7 @@ echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo deb
 sudo apt-get --yes --force-yes install \
     apache2 \
     build-essential \
+    compizconfig-settings-manager \
     curl \
     dos2unix \
     dpkg-dev \
