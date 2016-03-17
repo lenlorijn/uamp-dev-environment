@@ -533,7 +533,7 @@ then
 ServerAdmin ${USER}@localhost
 AddDefaultCharset UTF-8
 
-<Directory "/home/${USER}/workspace/dev.mediacthq.nl/">
+<Directory "/home/${USER}/workspace/">
         Options Indexes FollowSymLinks
         AllowOverride all
         Require all granted
@@ -542,13 +542,13 @@ AddDefaultCharset UTF-8
 <VirtualHost *:80>
     ServerName dev.mediacthq.nl
     ServerAlias *.dev.mediacthq.nl
-    VirtualDocumentRoot /home/${USER}/www/%-4+
+    VirtualDocumentRoot /home/${USER}/workspace/dev.mediacthq.nl/%-4+
 </VirtualHost>
 
 <VirtualHost *:443>
     ServerName dev.mediacthq.nl
     ServerAlias *.dev.mediacthq.nl
-    VirtualDocumentRoot /home/${USER}/www/%-4+
+    VirtualDocumentRoot /home/${USER}/workspace/dev.mediacthq.nl/%-4+
     SSLEngine on
     SSLProtocol all
     SSLCertificateKeyFile /home/${USER}/lib/ssl/private/_wildcard_.dev.mediacthq.nl.key
