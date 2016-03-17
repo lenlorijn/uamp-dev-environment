@@ -206,7 +206,7 @@ shame = blame
 autosetupmerge = true
 [core]
 autocrlf = input
-excludesfile = ~/.git-local/gitignore
+excludesfile = ~/.gitignore
 [push]
 default = matching
 [fetch]
@@ -215,17 +215,9 @@ prune = true
 push = refs/heads/*:refs/heads/*
 push = refs/tags/*:refs/tags/*
 [init]
-templatedir = ~/.git-local/template
+#templatedir = ~/.git-local/template
 EOT
 fi
-
-for dir in ~/.git-local ~/.git-local/hooks ~/.git-local/template ~/.git-local/template/hooks
-do
-    if [ ! -d $dir ]
-    then
-        mkdir -p $dir
-    fi
-done
 
 if [ ! -f ~/.gitignore ]
 then
@@ -237,77 +229,85 @@ then
 EOT
 fi
 
-if [ ! -f ~/.git-local/hooks/pre-commit ]
-then
-    echo Creating pre-commit hook file
-    cat > ~/.git-local/hooks/pre-commit << "EOT"
-#!/bin/bash
+#for dir in ~/.git-local/hooks ~/.git-local/template/hooks
+#do
+#    if [ ! -d $dir ]
+#    then
+#        mkdir -p $dir
+#    fi
+#done
 #
-# Based on http://nrocco.github.io/2012/04/19/git-pre-commit-hook-for-PHP.html post
-# and https://gist.github.com/jpetitcolas/ce00feaf19d46bfd5691
+#if [ ! -f ~/.git-local/hooks/pre-commit ]
+#then
+#    echo Creating pre-commit hook file
+#    cat > ~/.git-local/hooks/pre-commit << "EOT"
+##!/bin/bash
+##
+## Based on http://nrocco.github.io/2012/04/19/git-pre-commit-hook-for-PHP.html post
+## and https://gist.github.com/jpetitcolas/ce00feaf19d46bfd5691
+##
+## Do not forget to: chmod +x .git/hooks/pre-commit
 #
-# Do not forget to: chmod +x .git/hooks/pre-commit
-
-BAD_PHP_WORDS='var_dump|die|exit|ini_set|extract|__halt_compiler|eval'
-BAD_JS_WORDS='console.log'
-BAD_TWIG_WORDS='{{ dump(.*) }}'
-
-EXITCODE=0
-FILES=`git diff --cached --diff-filter=ACMRTUXB --name-only HEAD --`
-
-for FILE in $FILES ; do
-
-  if [ "${FILE:9:4}" = "core" ]; then
-    echo "CORE FILE EDITED!"
-    echo $FILE
-    EXITCODE=1
-  fi
-
-  if [ "${FILE##*.}" = "php" ]; then
-    # Run all php files through php -l and grep for `illegal` words
-    /usr/bin/php -l "$FILE" > /dev/null
-    if [ $? -gt 0 ]; then
-      EXITCODE=1
-    fi
-
-    /bin/grep -H -i -n -E "${BAD_PHP_WORDS}" $FILE
-    if [ $? -eq 0 ]; then
-      EXITCODE=1
-    fi
-  fi
-
-  if [ "${FILE##*.}" = "twig" ]; then
-    /bin/grep -H -i -n -E "${BAD_JS_WORDS}" $FILE
-    if [ $? -eq 0 ]; then
-      EXITCODE=1
-    fi
-  fi
-
-  if [ "${FILE##*.}" = "js" ]; then
-    /bin/grep -H -i -n -E "${BAD_TWIG_WORDS}" $FILE
-    if [ $? -eq 0 ]; then
-      EXITCODE=1
-    fi
-  fi
-done
-
-if [ $EXITCODE -gt 0 ]; then
-  echo
-  echo 'Fix the above erros or use:'
-  echo ' git commit -n'
-  echo
-fi
-
-exit $EXITCODE
-EOT
-    chmod +x ~/.git-local/hooks/pre-commit
-fi
-
-if [ ! -L ~/.git-local/template/hooks/pre-commit ]
-then
-    echo Creating pre-commit hook symlink
-    ln -s ~/.git-local/hooks/pre-commit ~/.git-local/template/hooks/pre-commit
-fi
+#BAD_PHP_WORDS='var_dump|die|exit|ini_set|extract|__halt_compiler|eval'
+#BAD_JS_WORDS='console.log'
+#BAD_TWIG_WORDS='{{ dump(.*) }}'
+#
+#EXITCODE=0
+#FILES=`git diff --cached --diff-filter=ACMRTUXB --name-only HEAD --`
+#
+#for FILE in $FILES ; do
+#
+#  if [ "${FILE:9:4}" = "core" ]; then
+#    echo "CORE FILE EDITED!"
+#    echo $FILE
+#    EXITCODE=1
+#  fi
+#
+#  if [ "${FILE##*.}" = "php" ]; then
+#    # Run all php files through php -l and grep for `illegal` words
+#    /usr/bin/php -l "$FILE" > /dev/null
+#    if [ $? -gt 0 ]; then
+#      EXITCODE=1
+#    fi
+#
+#    /bin/grep -H -i -n -E "${BAD_PHP_WORDS}" $FILE
+#    if [ $? -eq 0 ]; then
+#      EXITCODE=1
+#    fi
+#  fi
+#
+#  if [ "${FILE##*.}" = "twig" ]; then
+#    /bin/grep -H -i -n -E "${BAD_JS_WORDS}" $FILE
+#    if [ $? -eq 0 ]; then
+#      EXITCODE=1
+#    fi
+#  fi
+#
+#  if [ "${FILE##*.}" = "js" ]; then
+#    /bin/grep -H -i -n -E "${BAD_TWIG_WORDS}" $FILE
+#    if [ $? -eq 0 ]; then
+#      EXITCODE=1
+#    fi
+#  fi
+#done
+#
+#if [ $EXITCODE -gt 0 ]; then
+#  echo
+#  echo 'Fix the above erros or use:'
+#  echo ' git commit -n'
+#  echo
+#fi
+#
+#exit $EXITCODE
+#EOT
+#    chmod +x ~/.git-local/hooks/pre-commit
+#fi
+#
+#if [ ! -L ~/.git-local/template/hooks/pre-commit ]
+#then
+#    echo Creating pre-commit hook symlink
+#    ln -s ~/.git-local/hooks/pre-commit ~/.git-local/template/hooks/pre-commit
+#fi
 
 echo Increasing Inotify watches limit
 if [ `grep fs.inotify.max_user_watches /etc/sysctl.conf | wc -l` -eq "0" ]
