@@ -493,6 +493,10 @@ if [ ! -L ${PHP_PATH}/cli/conf.d/00-custom.ini ]
 then
     sudo ln -s ${PHP_PATH}/mods-available/custom.ini ${PHP_PATH}/cli/conf.d/00-custom.ini
 fi
+if [ ! -L ${PHP_PATH}/apache2/conf.d/00-custom.ini ]
+then
+    sudo ln -s ${PHP_PATH}/mods-available/custom.ini ${PHP_PATH}/apache2/conf.d/00-custom.ini
+fi
 
 # xdebug is slow
 # php7 has memcache build-in
