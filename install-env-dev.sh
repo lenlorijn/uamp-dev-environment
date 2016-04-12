@@ -1,4 +1,5 @@
 #!/bin/sh
+#!/bin/sh
 
 EXTRA_APPS=0
 EXTRA_THEME=0
@@ -464,7 +465,7 @@ else
     PHP_PATH="/etc/php/7.0"
 fi
 
-sudo sh -c 'cat > $PHP_PATH/mods-available/custom.ini' << EOF
+sudo sh -c "cat > $PHP_PATH/mods-available/custom.ini" << EOF
 [PHP]
 short_open_tag = On
 max_execution_time = 0
@@ -561,8 +562,30 @@ fi
 
 echo Configuring apache
 sudo sed -ie "s/www-data/${USER}/g" /etc/apache2/envvars
+APACHE_MODULES="rewrite \
+    alias \
+    auth_basic \
+    autoindex \
+    dir \
+    env \
+    filter \
+    headers \
+    ssl \
+    status \
+    mime \
+    deflate \
+    negotiation \
+    mpm_prefork \
+    setenvif \
+    vhost_alias"
 
-for mod in rewrite alias auth_basic autoindex dir env filter headers ssl status mime deflate php5 negotiation mpm_prefork setenvif vhost_alias
+if [ "$VERSION" -lt "16" ]
+then
+    APACHE_MODULES=$(echo "$APACHE_MODULES php5")
+else
+    APACHE_MODULES=$(echo "$APACHE_MODULES php7.0")
+fi
+for mod in $APACHE_MODULES
 do
     sudo a2enmod $mod > $VERBOSE 2>&1
 done
