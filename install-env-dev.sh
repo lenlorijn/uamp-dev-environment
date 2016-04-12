@@ -5,6 +5,7 @@ EXTRA_THEME=0
 EXTRA_SHELL=0
 EXTRA_BTSEC=0
 VERBOSE=/dev/null
+VERSION=`lsb_release -r | sed 's/Release:[^0-9]*\([0-9]*\)\..*/\1/'`
 
 dev_install_print_usage() {
     cat << EOT
@@ -76,8 +77,8 @@ echo Installing PPA\'s
 if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]
 then
     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -  > $VERBOSE
+    sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 fi
-sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 
 if [ "$EXTRA_BTSEC" -eq "1" ]
 then
@@ -88,7 +89,10 @@ fi
 sudo add-apt-repository --yes ppa:webupd8team/java > $VERBOSE 2>&1
 
 # Leolik for Notify-OSD
-sudo add-apt-repository --yes ppa:leolik/leolik > $VERBOSE 2>&1
+if [ "$VERSION" -lt "16" ]
+then
+    sudo add-apt-repository --yes ppa:leolik/leolik > $VERBOSE 2>&1
+fi
 
 echo Updating APT
 
@@ -109,8 +113,7 @@ echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-se
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 
-sudo apt-get --yes --force-yes install \
-    apache2 \
+PACKAGES="apache2 \
     build-essential \
     compizconfig-settings-manager \
     curl \
@@ -121,7 +124,6 @@ sudo apt-get --yes --force-yes install \
     git-flow \
     google-chrome-stable \
     iptables-persistent \
-    libapache2-mod-php5 \
     libnotify-bin \
     libnss-winbind \
     libsqlite3-dev \
@@ -134,6 +136,26 @@ sudo apt-get --yes --force-yes install \
     npm \
     oracle-java8-installer \
     openvpn \
+    php-codesniffer \
+    php-invoker \
+    phpmd \
+    php-pear \
+    php-timer \
+    phpunit \
+    python \
+    python-pip \
+    redis-server \
+    redis-tools \
+    ruby \
+    ruby-dev \
+    software-properties-common \
+    vim \
+    wget \
+    whois"
+if [ "$VERSION" -lt "16" ]
+then
+    PACKAGES=$(echo "$PACKAGES \
+    libapache2-mod-php5 \
     php5 \
     php5-cli \
     php5-common \
@@ -154,25 +176,31 @@ sudo apt-get --yes --force-yes install \
     php5-tidy \
     php5-xsl \
     php5-imagick \
-    php5-xdebug  \
-    php-codesniffer \
-    php-invoker \
-    phpmd \
-    php-pear \
-    php-timer \
-    phpunit \
-    python \
-    python-pip \
-    redis-server \
-    redis-tools \
-    ruby2.2 \
-    ruby2.2-dev \
-    ruby \
-    ruby-dev \
-    software-properties-common \
-    vim \
-    wget \
-    whois > $VERBOSE
+    php5-xdebug")
+else
+    PACKAGES=$(echo "$PACKAGES \
+    libapache2-mod-php7.0 \
+    php7.0 \
+    php7.0-cli \
+    php7.0-curl \
+    php7.0-dev \
+    php7.0-gd \
+    php7.0-common \
+    php7.0-json \
+    php7.0-intl \
+    php7.0-mcrypt \
+    php7.0-mysql \
+    php7.0-odbc \
+    php7.0-readline \
+    php7.0-tidy \
+    php7.0-xsl \
+    php7.0-sybase \
+    php-redis \
+    php-mongodb \
+    php-imagick \
+    php-xdebug")
+fi
+sudo apt-get --yes --force-yes install $PACKAGES > $VERBOSE
 
 if [ `which grunt | wc -l` -eq "0" ]
 then
@@ -410,7 +438,7 @@ fi
 echo Installing mailcatcher
 if [ `which mailcatcher | wc -l` -eq "0" ]
 then
-    sudo gem2.2 install mailcatcher > $VERBOSE
+    sudo gem install mailcatcher > $VERBOSE
     sudo sh -c 'cat > /etc/systemd/system/mailcatcher.service' << EOF
 [Unit]
 Description=Ruby MailCatcher
@@ -429,7 +457,14 @@ EOF
 fi
 
 echo Configuring PHP
-    sudo sh -c 'cat > /etc/php5/mods-available/custom.ini' << EOF
+if [ "$VERSION" -lt "16" ]
+then
+    PHP_PATH="/etc/php5"
+else
+    PHP_PATH="/etc/php/7.0"
+fi
+
+sudo sh -c 'cat > $PHP_PATH/mods-available/custom.ini' << EOF
 [PHP]
 short_open_tag = On
 max_execution_time = 0
@@ -454,29 +489,57 @@ xdebug.max_nesting_level=1000
 xdebug.coverage_enable=1
 EOF
 
-sudo rm /etc/php5/cli/conf.d/* /etc/php5/apache2/conf.d/*
-
-if [ ! -L /etc/php5/cli/conf.d/00-custom.ini ]
+if [ ! -L $PHP_PATH/cli/conf.d/00-custom.ini ]
 then
-    sudo ln -s ../../mods-available/custom.ini /etc/php5/cli/conf.d/00-custom.ini
-fi
-
-if [ ! -L /etc/php5/cli/conf.d/05-opcache.ini ]
-then
-    sudo ln -s ../../mods-available/opcache.ini /etc/php5/cli/conf.d/05-opcache.ini
+    sudo ln -s $PHP_PATH/mods-available/custom.ini $PHP_PATH/cli/conf.d/00-custom.ini
 fi
 
 # xdebug is slow
+# php7 has memcache build-in
+# mssql has been removed from php7
+# mysql is now only supported trough pdo_mysql
 # for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
-for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xsl
+PHP_MODULES="curl \
+gd \
+imagick \
+intl \
+json \
+mcrypt \
+mysqli \
+odbc \
+pdo \
+pdo_dblib \
+pdo_mysql \
+pdo_odbc \
+readline \
+redis \
+tidy \
+xsl"
+
+if [ "$VERSION" -lt "16" ]
+then
+    PHP_MODULES=$(echo "$PHP_MODULES \
+        memcached \
+        memcache \
+        mongo \
+        mssql \
+        mysql")
+else
+    PHP_MODULES=$(echo "$PHP_MODULES mongodb")
+fi
+
+for mod in $PHP_MODULES
 do
-    if [ ! -L "/etc/php5/cli/conf.d/10-${mod}.ini" ]
+    if [ `php -m | grep ${mod} | wc -l` -eq "0" ]
     then
-        sudo ln -s ../../mods-available/${mod}.ini /etc/php5/cli/conf.d/10-${mod}.ini
+        if [ "$VERSION" -lt "16" ]
+        then
+            sudo php5enmod ${mod}
+        else
+            sudo phpenmod ${mod}
+        fi
     fi
 done
-
-sudo cp -a /etc/php5/cli/conf.d/* /etc/php5/apache2/conf.d/
 
 # Remove xdebug from CLI because of issues with composer, resolving this via aliases
 #sudo rm /etc/php5/cli/conf.d/10-xdebug.ini
