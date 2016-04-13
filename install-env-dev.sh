@@ -503,22 +503,8 @@ fi
 # mssql has been removed from php7
 # mysql is now only supported trough pdo_mysql
 # for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
-PHP_MODULES="curl \
-gd \
-imagick \
-intl \
-json \
-mcrypt \
-mysqli \
-odbc \
-pdo \
-pdo_dblib \
-pdo_mysql \
-pdo_odbc \
-readline \
-redis \
-tidy \
-xsl"
+PHP_MODULES="curl gd imagick intl json mcrypt mysqli odbc pdo pdo_dblib \
+    pdo_mysql pdo_odbc readline redis tidy xsl"
 
 if [ "${VERSION}" -lt "16" ]
 then
@@ -560,22 +546,8 @@ fi
 
 echo Configuring apache
 sudo sed -ie "s/www-data/${USER}/g" /etc/apache2/envvars
-APACHE_MODULES="rewrite \
-    alias \
-    auth_basic \
-    autoindex \
-    dir \
-    env \
-    filter \
-    headers \
-    ssl \
-    status \
-    mime \
-    deflate \
-    negotiation \
-    mpm_prefork \
-    setenvif \
-    vhost_alias"
+APACHE_MODULES="rewrite alias auth_basic autoindex dir env filter headers ssl \
+    status mime deflate negotiation mpm_prefork setenvif vhost_alias"
 
 if [ "$VERSION" -lt "16" ]
 then
