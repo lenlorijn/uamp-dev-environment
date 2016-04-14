@@ -113,92 +113,30 @@ echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-se
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 
-PACKAGES="apache2 \
-    build-essential \
-    compizconfig-settings-manager \
-    curl \
-    dos2unix \
-    dpkg-dev \
-    easy-rsa \
-    git \
-    git-flow \
-    google-chrome-stable \
-    iptables-persistent \
-    libnotify-bin \
-    libnss-winbind \
-    libsqlite3-dev \
-    lm-sensors \
-    mysql-client \
-    mysql-server \
-    mtpfs \
-    network-manager-openvpn \
-    nodejs-legacy \
-    npm \
-    oracle-java8-installer \
-    openvpn \
-    php-codesniffer \
-    php-invoker \
-    phpmd \
-    php-pear \
-    php-timer \
-    phpunit \
-    python \
-    python-pip \
-    redis-server \
-    redis-tools \
-    ruby \
-    ruby-dev \
-    software-properties-common \
-    vim \
-    wget \
-    whois"
+PACKAGES="apache2 build-essential compizconfig-settings-manager curl dos2unix"
+PACKAGES="${PACKAGES} dpkg-dev easy-rsa git git-flow google-chrome-stable"
+PACKAGES="${PACKAGES} iptables-persistent libnotify-bin libnss-winbind"
+PACKAGES="${PACKAGES} libsqlite3-dev lm-sensors mysql-client mysql-server"
+PACKAGES="${PACKAGES} mtpfs network-manager-openvpn nodejs-legacy npm"
+PACKAGES="${PACKAGES} oracle-java8-installer openvpn php-codesniffer"
+PACKAGES="${PACKAGES} php-invoker phpmd php-pear php-timer phpunit python"
+PACKAGES="${PACKAGES} python-pip redis-server redis-tools ruby ruby-dev"
+PACKAGES="${PACKAGES} software-properties-common vim wget whois"
+
 if [ "${VERSION}" -lt "16" ]
 then
-    PACKAGES=$(echo "${PACKAGES} \
-    libapache2-mod-php5 \
-    php5 \
-    php5-cli \
-    php5-common \
-    php5-curl \
-    php5-dev \
-    php5-gd \
-    php5-intl \
-    php5-json \
-    php5-mcrypt \
-    php5-memcache \
-    php5-memcached \
-    php5-mongo \
-    php5-mysql \
-    php5-odbc \
-    php5-readline \
-    php5-redis \
-    php5-sybase \
-    php5-tidy \
-    php5-xsl \
-    php5-imagick \
-    php5-xdebug")
+    PACKAGES="${PACKAGES} libapache2-mod-php5 php5 php5-cli php5-common"
+    PACKAGES="${PACKAGES} php5-curl php5-dev php5-gd php5-intl php5-json"
+    PACKAGES="${PACKAGES} php5-mcrypt php5-memcache php5-memcached php5-mongo"
+    PACKAGES="${PACKAGES} php5-mysql php5-odbc php5-readline php5-redis"
+    PACKAGES="${PACKAGES} php5-sybase php5-tidy php5-xsl php5-imagick"
+    PACKAGES="${PACKAGES} php5-xdebug"
 else
-    PACKAGES=$(echo "${PACKAGES} \
-    libapache2-mod-php7.0 \
-    php7.0 \
-    php7.0-cli \
-    php7.0-curl \
-    php7.0-dev \
-    php7.0-gd \
-    php7.0-common \
-    php7.0-json \
-    php7.0-intl \
-    php7.0-mcrypt \
-    php7.0-mysql \
-    php7.0-odbc \
-    php7.0-readline \
-    php7.0-tidy \
-    php7.0-xsl \
-    php7.0-sybase \
-    php-redis \
-    php-mongodb \
-    php-imagick \
-    php-xdebug")
+    PACKAGES="${PACKAGES} libapache2-mod-php7.0 php7.0 php7.0-cli php7.0-curl"
+    PACKAGES="${PACKAGES} php7.0-dev php7.0-gd php7.0-common php7.0-json"
+    PACKAGES="${PACKAGES} php7.0-intl php7.0-mcrypt php7.0-mysql php7.0-odbc"
+    PACKAGES="${PACKAGES} php7.0-readline php7.0-tidy php7.0-xsl php7.0-sybase"
+    PACKAGES="${PACKAGES} php-redis php-mongodb php-imagick php-xdebug"
 fi
 sudo apt-get --yes --force-yes install ${PACKAGES} > ${VERBOSE}
 
@@ -503,14 +441,14 @@ fi
 # mssql has been removed from php7
 # mysql is now only supported trough pdo_mysql
 # for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
-PHP_MODULES="curl gd imagick intl json mcrypt mysqli odbc pdo pdo_dblib \
-    pdo_mysql pdo_odbc readline redis tidy xsl"
+PHP_MODULES="curl gd imagick intl json mcrypt mysqli odbc pdo pdo_dblib"
+PHP_MODULES="${PHP_MODULES} pdo_mysql pdo_odbc readline redis tidy xsl"
 
 if [ "${VERSION}" -lt "16" ]
 then
-    PHP_MODULES=$(echo "${PHP_MODULES} memcached memcache mongo mssql mysql")
+    PHP_MODULES="${PHP_MODULES} memcached memcache mongo mssql mysql"
 else
-    PHP_MODULES=$(echo "${PHP_MODULES} mongodb")
+    PHP_MODULES="${PHP_MODULES} mongodb"
 fi
 
 for mod in ${PHP_MODULES}
@@ -546,14 +484,15 @@ fi
 
 echo Configuring apache
 sudo sed -ie "s/www-data/${USER}/g" /etc/apache2/envvars
-APACHE_MODULES="rewrite alias auth_basic autoindex dir env filter headers ssl \
-    status mime deflate negotiation mpm_prefork setenvif vhost_alias"
+APACHE_MODULES="rewrite alias auth_basic autoindex dir env filter headers ssl"
+APACHE_MODULES="${APACHE_MODULES} status mime deflate negotiation mpm_prefork"
+APACHE_MODULES="${APACHE_MODULES} setenvif vhost_alias"
 
 if [ "$VERSION" -lt "16" ]
 then
-    APACHE_MODULES=$(echo "${APACHE_MODULES} php5")
+    APACHE_MODULES="${APACHE_MODULES} php5"
 else
-    APACHE_MODULES=$(echo "${APACHE_MODULES} php7.0")
+    APACHE_MODULES="${APACHE_MODULES} php7.0"
 fi
 for mod in ${APACHE_MODULES}
 do
