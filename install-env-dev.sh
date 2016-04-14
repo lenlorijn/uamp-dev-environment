@@ -376,7 +376,12 @@ fi
 echo Installing mailcatcher
 if [ `which mailcatcher | wc -l` -eq "0" ]
 then
-    sudo gem install mailcatcher > ${VERBOSE}
+    if [ "${VERSION}" -lt "16" ]
+    then
+        sudo gem2.2 install mailcatcher > ${VERBOSE}
+    else
+        sudo gem install mailcatcher > ${VERBOSE}
+    fi
     sudo sh -c 'cat > /etc/systemd/system/mailcatcher.service' << EOF
 [Unit]
 Description=Ruby MailCatcher
