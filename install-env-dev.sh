@@ -104,9 +104,6 @@ sudo apt-get --yes dist-upgrade > ${VERBOSE}
 
 echo Installing software
 
-echo "mysql-server mysql-server/root_password password" | sudo debconf-set-selections
-echo "mysql-server mysql-server/root_password_again password" | sudo debconf-set-selections
-
 echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
 echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
 
@@ -116,7 +113,7 @@ echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo deb
 PACKAGES="apache2 build-essential compizconfig-settings-manager curl dos2unix"
 PACKAGES="${PACKAGES} dpkg-dev easy-rsa git git-flow google-chrome-stable"
 PACKAGES="${PACKAGES} iptables-persistent libnotify-bin libnss-winbind"
-PACKAGES="${PACKAGES} libsqlite3-dev lm-sensors mysql-client mysql-server"
+PACKAGES="${PACKAGES} libsqlite3-dev lm-sensors mysql-client"
 PACKAGES="${PACKAGES} mtpfs network-manager-openvpn nodejs-legacy npm"
 PACKAGES="${PACKAGES} oracle-java8-installer openvpn php-codesniffer"
 PACKAGES="${PACKAGES} php-invoker phpmd php-pear php-timer phpunit python"
@@ -138,6 +135,7 @@ else
     PACKAGES="${PACKAGES} php7.0-readline php7.0-tidy php7.0-xsl php7.0-sybase"
     PACKAGES="${PACKAGES} php-redis php-mongodb php-imagick php-xdebug"
 fi
+sudo apt-get --yes --force-yes install mysql-server
 sudo apt-get --yes --force-yes install ${PACKAGES} > ${VERBOSE}
 
 if [ `which grunt | wc -l` -eq "0" ]
