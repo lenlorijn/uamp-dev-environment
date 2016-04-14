@@ -378,10 +378,11 @@ if [ `which mailcatcher | wc -l` -eq "0" ]
 then
     if [ "${VERSION}" -lt "16" ]
     then
-        sudo gem2.2 install mailcatcher > ${VERBOSE}
+        GEM_BIN=$(which gem2.2 || which gem)
     else
-        sudo gem install mailcatcher > ${VERBOSE}
+        GEM_BIN=$(which gem)
     fi
+    sudo ${GEM_BIN} install mailcatcher > ${VERBOSE}
     sudo sh -c 'cat > /etc/systemd/system/mailcatcher.service' << EOF
 [Unit]
 Description=Ruby MailCatcher
