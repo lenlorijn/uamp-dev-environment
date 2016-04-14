@@ -376,11 +376,13 @@ fi
 echo Installing mailcatcher
 if [ `which mailcatcher | wc -l` -eq "0" ]
 then
+    GEM_BIN=$(which gem)
     if [ "${VERSION}" -lt "16" ]
     then
-        GEM_BIN=$(which gem2.2 || which gem)
-    else
-        GEM_BIN=$(which gem)
+        if hash gem2.2 2> /dev/null
+        then
+            GEM_BIN=gem2.2
+        fi
     fi
     sudo ${GEM_BIN} install mailcatcher > ${VERBOSE}
     sudo sh -c 'cat > /etc/systemd/system/mailcatcher.service' << EOF
