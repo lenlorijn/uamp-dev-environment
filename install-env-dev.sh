@@ -138,6 +138,22 @@ fi
 sudo apt-get --yes --force-yes install mysql-server
 sudo apt-get --yes --force-yes install ${PACKAGES} > ${VERBOSE}
 
+if [ ! -f ~/.my.cnf ]
+then
+    MYSQLPWD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
+    touch ~/.my.cnf
+    chmod 600 ~/.my.cnf
+    cat>~/.my.cnf<<EOT
+[client]
+host=localhost
+user=${USER}
+password=${MYSQLPWD}
+EOT
+    sudo mysql -e "create user '${USER}'@'localhost' identified by '${MYSQLPWD}'"
+    sudo mysql -e "grant all privileges on *.* to '${USER}'@'localhost'"
+    sudo mysql -e "flush privileges"
+fi
+
 if [ `which grunt | wc -l` -eq "0" ]
 then
     echo Installing grunt
