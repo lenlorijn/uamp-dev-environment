@@ -366,9 +366,10 @@ fi
 
 if [ "$EXTRA_THEME" -eq "1" ]
 then
+    sudo add-apt-repository --yes ppa:numix/ppa
     sudo apt-get --yes --force-yes install numix-gtk-theme numix-icon-theme \
-        unity-tweak-tool numix-folders numix-icon-theme \
-        numix-icon-theme-circle numix-plymouth-theme > ${VERBOSE}
+        unity-tweak-tool numix-icon-theme \
+        numix-icon-theme-circle > ${VERBOSE}
 fi
 
 echo Installing mailcatcher
