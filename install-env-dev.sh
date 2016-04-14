@@ -5,6 +5,7 @@ EXTRA_THEME=0
 EXTRA_SHELL=0
 EXTRA_BTSEC=0
 VERBOSE=/dev/null
+VERSION=`lsb_release -r | sed 's/Release:[^0-9]*\([0-9]*\)\..*/\1/'`
 
 dev_install_print_usage() {
     cat << EOT
@@ -64,9 +65,9 @@ rm -rf ~/Public ~/Templates ~/Videos ~/Music ~/Examples
 echo Creating useful folders
 for dir in bin
 do
-    if [ ! -d ~/$dir ]
+    if [ ! -d ~/${dir} ]
     then
-        mkdir -p ~/$dir
+        mkdir -p ~/${dir}
     fi
 done
 
@@ -75,28 +76,31 @@ echo Installing PPA\'s
 # Google Chrome
 if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]
 then
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -  > $VERBOSE
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -  > ${VERBOSE}
 fi
 sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 
-if [ "$EXTRA_BTSEC" -eq "1" ]
+if [ "${EXTRA_BTSEC}" -eq "1" ]
 then
     sudo add-apt-repository --yes ppa:fixnix/indicator-systemtray-unity
 fi
 
 # WebUpd8 for Oracle java
-sudo add-apt-repository --yes ppa:webupd8team/java > $VERBOSE 2>&1
+sudo add-apt-repository --yes ppa:webupd8team/java > ${VERBOSE} 2>&1
 
 # Leolik for Notify-OSD
-sudo add-apt-repository --yes ppa:leolik/leolik > $VERBOSE 2>&1
+if [ "${VERSION}" -lt "16" ]
+then
+    sudo add-apt-repository --yes ppa:leolik/leolik > ${VERBOSE} 2>&1
+fi
 
 echo Updating APT
 
-sudo apt-get update > $VERBOSE
+sudo apt-get update > ${VERBOSE}
 
 echo Upgrading APT
 
-sudo apt-get --yes dist-upgrade > $VERBOSE
+sudo apt-get --yes dist-upgrade > ${VERBOSE}
 
 echo Installing software
 
@@ -109,75 +113,37 @@ echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-se
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 
-sudo apt-get --yes --force-yes install \
-    apache2 \
-    build-essential \
-    compizconfig-settings-manager \
-    curl \
-    dos2unix \
-    dpkg-dev \
-    easy-rsa \
-    git \
-    git-flow \
-    google-chrome-stable \
-    iptables-persistent \
-    libapache2-mod-php5 \
-    libnotify-bin \
-    libnss-winbind \
-    libsqlite3-dev \
-    lm-sensors \
-    mysql-client \
-    mysql-server \
-    mtpfs \
-    network-manager-openvpn \
-    nodejs-legacy \
-    npm \
-    oracle-java8-installer \
-    openvpn \
-    php5 \
-    php5-cli \
-    php5-common \
-    php5-curl \
-    php5-dev \
-    php5-gd \
-    php5-intl \
-    php5-json \
-    php5-mcrypt \
-    php5-memcache \
-    php5-memcached \
-    php5-mongo \
-    php5-mysql \
-    php5-odbc \
-    php5-readline \
-    php5-redis \
-    php5-sybase \
-    php5-tidy \
-    php5-xsl \
-    php5-imagick \
-    php5-xdebug  \
-    php-codesniffer \
-    php-invoker \
-    phpmd \
-    php-pear \
-    php-timer \
-    phpunit \
-    python \
-    python-pip \
-    redis-server \
-    redis-tools \
-    ruby2.2 \
-    ruby2.2-dev \
-    ruby \
-    ruby-dev \
-    software-properties-common \
-    vim \
-    wget \
-    whois > $VERBOSE
+PACKAGES="apache2 build-essential compizconfig-settings-manager curl dos2unix"
+PACKAGES="${PACKAGES} dpkg-dev easy-rsa git git-flow google-chrome-stable"
+PACKAGES="${PACKAGES} iptables-persistent libnotify-bin libnss-winbind"
+PACKAGES="${PACKAGES} libsqlite3-dev lm-sensors mysql-client mysql-server"
+PACKAGES="${PACKAGES} mtpfs network-manager-openvpn nodejs-legacy npm"
+PACKAGES="${PACKAGES} oracle-java8-installer openvpn php-codesniffer"
+PACKAGES="${PACKAGES} php-invoker phpmd php-pear php-timer phpunit python"
+PACKAGES="${PACKAGES} python-pip redis-server redis-tools ruby ruby-dev"
+PACKAGES="${PACKAGES} software-properties-common vim wget whois"
+
+if [ "${VERSION}" -lt "16" ]
+then
+    PACKAGES="${PACKAGES} libapache2-mod-php5 php5 php5-cli php5-common"
+    PACKAGES="${PACKAGES} php5-curl php5-dev php5-gd php5-intl php5-json"
+    PACKAGES="${PACKAGES} php5-mcrypt php5-memcache php5-memcached php5-mongo"
+    PACKAGES="${PACKAGES} php5-mysql php5-odbc php5-readline php5-redis"
+    PACKAGES="${PACKAGES} php5-sybase php5-tidy php5-xsl php5-imagick"
+    PACKAGES="${PACKAGES} php5-xdebug"
+else
+    PACKAGES="${PACKAGES} libapache2-mod-php7.0 php7.0 php7.0-cli php7.0-curl"
+    PACKAGES="${PACKAGES} php7.0-dev php7.0-gd php7.0-common php7.0-json"
+    PACKAGES="${PACKAGES} php7.0-intl php7.0-mcrypt php7.0-mysql php7.0-odbc"
+    PACKAGES="${PACKAGES} php7.0-readline php7.0-tidy php7.0-xsl php7.0-sybase"
+    PACKAGES="${PACKAGES} php-redis php-mongodb php-imagick php-xdebug"
+fi
+sudo apt-get --yes --force-yes install ${PACKAGES} > ${VERBOSE}
 
 if [ `which grunt | wc -l` -eq "0" ]
 then
     echo Installing grunt
-    sudo npm install -g grunt-cli > $VERBOSE
+    sudo npm install -g grunt-cli > ${VERBOSE}
 fi
 
 echo Configuring /etc/nsswitch.conf
@@ -196,8 +162,8 @@ then
 
     cat > ~/.gitconfig << EOT
 [user]
-name = $GIT NAME
-email = $GIT_EMAIL
+name = ${GIT_NAME}
+email = ${GIT_EMAIL}
 [alias]
 ci = commit
 co = checkout
@@ -318,18 +284,18 @@ EOF
     sudo sysctl -p
 fi
 
-if [ "$EXTRA_APPS" -eq "1" ]
+if [ "${EXTRA_APPS}" -eq "1" ]
 then
-    sudo apt-get --yes --force-yes install gimp mysql-workbench > $VERBOSE
+    sudo apt-get --yes --force-yes install gimp mysql-workbench > ${VERBOSE}
 fi
 
-if [ "$EXTRA_SHELL" -eq "1" ]
+if [ "${EXTRA_SHELL}" -eq "1" ]
 then
-    sudo apt-get --yes --force-yes install zsh powerline > $VERBOSE
+    sudo apt-get --yes --force-yes install zsh powerline > ${VERBOSE}
     # initialize zsh
     echo Press ctrl+d or type exit if zsh does not close automatically
     zsh -c 'exit'
-    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > $VERBOSE
+    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > ${VERBOSE}
     sudo sed -ie "s#^\($(whoami).*:\)\([^:]*\)\$#\1$(which zsh)#g" /etc/passwd
     if [ -f ~/.zshrc ]
     then
@@ -355,12 +321,12 @@ then
         fi
         if [ ! -d ~/lib/powerline-fonts ]
         then
-            git clone https://github.com/powerline/fonts.git ~/lib/powerline-fonts > $VERBOSE 2>&1
-            ~/lib/powerline-fonts/install.sh > $VERBOSE
+            git clone https://github.com/powerline/fonts.git ~/lib/powerline-fonts > ${VERBOSE} 2>&1
+            ~/lib/powerline-fonts/install.sh > ${VERBOSE}
         fi
         if [ ! -d ~/lib/powerline-shell ]
         then
-            git clone https://github.com/milkbikis/powerline-shell.git ~/lib/powerline-shell > $VERBOSE 2>&1
+            git clone https://github.com/milkbikis/powerline-shell.git ~/lib/powerline-shell > ${VERBOSE} 2>&1
             cd ~/lib/powerline-shell
             cat > config.py << EOF
 SEGMENTS = [
@@ -373,7 +339,7 @@ SEGMENTS = [
 ]
 THEME = 'default'
 EOF
-            ./install.py > $VERBOSE
+            ./install.py > ${VERBOSE}
             cd - > /dev/null
         fi
         sed -ie 's/^plugins=(.*)/plugins=(git composer cp git-flow heroku rsync redis-cli z n98-magerun)/' ~/.zshrc
@@ -404,13 +370,18 @@ if [ "$EXTRA_THEME" -eq "1" ]
 then
     sudo apt-get --yes --force-yes install numix-gtk-theme numix-icon-theme \
         unity-tweak-tool numix-folders numix-icon-theme \
-        numix-icon-theme-circle numix-plymouth-theme > $VERBOSE
+        numix-icon-theme-circle numix-plymouth-theme > ${VERBOSE}
 fi
 
 echo Installing mailcatcher
 if [ `which mailcatcher | wc -l` -eq "0" ]
 then
-    sudo gem2.2 install mailcatcher > $VERBOSE
+    if [ "${VERSION}" -lt "16" ]
+    then
+        sudo gem2.2 install mailcatcher > ${VERBOSE}
+    else
+        sudo gem install mailcatcher > ${VERBOSE}
+    fi
     sudo sh -c 'cat > /etc/systemd/system/mailcatcher.service' << EOF
 [Unit]
 Description=Ruby MailCatcher
@@ -424,12 +395,19 @@ ExecStart=$(which mailcatcher) --foreground --http-ip 127.0.0.1
 [Install]
 WantedBy=multi-user.target
 EOF
-    sudo systemctl enable mailcatcher.service > $VERBOSE
-    sudo service mailcatcher start > $VERBOSE
+    sudo systemctl enable mailcatcher.service > ${VERBOSE}
+    sudo service mailcatcher start > ${VERBOSE}
 fi
 
 echo Configuring PHP
-    sudo sh -c 'cat > /etc/php5/mods-available/custom.ini' << EOF
+if [ "${VERSION}" -lt "16" ]
+then
+    PHP_PATH="/etc/php5"
+else
+    PHP_PATH="/etc/php/7.0"
+fi
+
+sudo sh -c "cat > ${PHP_PATH}/mods-available/custom.ini" << EOF
 [PHP]
 short_open_tag = On
 max_execution_time = 0
@@ -454,29 +432,42 @@ xdebug.max_nesting_level=1000
 xdebug.coverage_enable=1
 EOF
 
-sudo rm /etc/php5/cli/conf.d/* /etc/php5/apache2/conf.d/*
-
-if [ ! -L /etc/php5/cli/conf.d/00-custom.ini ]
+if [ ! -L ${PHP_PATH}/cli/conf.d/00-custom.ini ]
 then
-    sudo ln -s ../../mods-available/custom.ini /etc/php5/cli/conf.d/00-custom.ini
+    sudo ln -s ${PHP_PATH}/mods-available/custom.ini ${PHP_PATH}/cli/conf.d/00-custom.ini
 fi
-
-if [ ! -L /etc/php5/cli/conf.d/05-opcache.ini ]
+if [ ! -L ${PHP_PATH}/apache2/conf.d/00-custom.ini ]
 then
-    sudo ln -s ../../mods-available/opcache.ini /etc/php5/cli/conf.d/05-opcache.ini
+    sudo ln -s ${PHP_PATH}/mods-available/custom.ini ${PHP_PATH}/apache2/conf.d/00-custom.ini
 fi
 
 # xdebug is slow
+# php7 has memcache build-in
+# mssql has been removed from php7
+# mysql is now only supported trough pdo_mysql
 # for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xdebug xsl
-for mod in curl gd imagick intl json mcrypt memcached memcache mongo mssql mysqli mysql odbc pdo pdo_dblib pdo_mysql pdo_odbc readline redis tidy xsl
+PHP_MODULES="curl gd imagick intl json mcrypt mysqli odbc pdo pdo_dblib"
+PHP_MODULES="${PHP_MODULES} pdo_mysql pdo_odbc readline redis tidy xsl"
+
+if [ "${VERSION}" -lt "16" ]
+then
+    PHP_MODULES="${PHP_MODULES} memcached memcache mongo mssql mysql"
+else
+    PHP_MODULES="${PHP_MODULES} mongodb"
+fi
+
+for mod in ${PHP_MODULES}
 do
-    if [ ! -L "/etc/php5/cli/conf.d/10-${mod}.ini" ]
+    if [ `php -m | grep ${mod} | wc -l` -eq "0" ]
     then
-        sudo ln -s ../../mods-available/${mod}.ini /etc/php5/cli/conf.d/10-${mod}.ini
+        if [ "${VERSION}" -lt "16" ]
+        then
+            sudo php5enmod ${mod}
+        else
+            sudo phpenmod ${mod}
+        fi
     fi
 done
-
-sudo cp -a /etc/php5/cli/conf.d/* /etc/php5/apache2/conf.d/
 
 # Remove xdebug from CLI because of issues with composer, resolving this via aliases
 #sudo rm /etc/php5/cli/conf.d/10-xdebug.ini
@@ -493,22 +484,31 @@ ft_min_word_len=3
 ft_boolean_syntax=' |-><()~*:""&^'
 innodb_log_file_size = 128M
 EOT
-    sudo service mysql restart > $VERBOSE
+    sudo service mysql restart > ${VERBOSE}
 fi
 
 echo Configuring apache
 sudo sed -ie "s/www-data/${USER}/g" /etc/apache2/envvars
+APACHE_MODULES="rewrite alias auth_basic autoindex dir env filter headers ssl"
+APACHE_MODULES="${APACHE_MODULES} status mime deflate negotiation mpm_prefork"
+APACHE_MODULES="${APACHE_MODULES} setenvif vhost_alias"
 
-for mod in rewrite alias auth_basic autoindex dir env filter headers ssl status mime deflate php5 negotiation mpm_prefork setenvif vhost_alias
+if [ "$VERSION" -lt "16" ]
+then
+    APACHE_MODULES="${APACHE_MODULES} php5"
+else
+    APACHE_MODULES="${APACHE_MODULES} php7.0"
+fi
+for mod in ${APACHE_MODULES}
 do
-    sudo a2enmod $mod > $VERBOSE 2>&1
+    sudo a2enmod ${mod} > ${VERBOSE} 2>&1
 done
 
 for dir in private certs
 do
-    if [ ! -d ~/lib/ssl/$dir ]
+    if [ ! -d ~/lib/ssl/${dir} ]
     then
-        mkdir -p ~/lib/ssl/$dir
+        mkdir -p ~/lib/ssl/${dir}
     fi
 done
 
@@ -519,9 +519,9 @@ fi
 
 for file in ~/lib/ssl/private/_wildcard_.dev.mediacthq.nl.key ~/lib/ssl/certs/_wildcard_.dev.mediacthq.nl.crt ~/lib/ssl/certs/Essential.ca-bundle
 do
-    if [ ! -f $file ]
+    if [ ! -f ${file} ]
     then
-        echo WARNING! $file not found. Download this from: https://wiki.mediact.nl/Ssl_dev.mediacthq.nl
+        echo WARNING! ${file} not found. Download this from: https://wiki.mediact.nl/Ssl_dev.mediacthq.nl
     fi
 done
 
@@ -558,19 +558,19 @@ AddDefaultCharset UTF-8
 EOF
 fi
 
-sudo a2ensite _wildcard_.dev.mediacthq.nl.conf > $VERBOSE 2>&1
+sudo a2ensite _wildcard_.dev.mediacthq.nl.conf > ${VERBOSE} 2>&1
 
 echo Installing composer
 if [ ! -f ~/bin/composer.phar ]
 then
     TMP=~
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=${TMP}/bin > $VERBOSE
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=${TMP}/bin > ${VERBOSE}
 fi
 
 echo Installing n98 magerun
 if [ ! -f ~/bin/n98-magerun.phar ]
 then
-    wget http://files.magerun.net/n98-magerun-latest.phar -O ~/bin/n98-magerun.phar > $VERBOSE
+    wget http://files.magerun.net/n98-magerun-latest.phar -O ~/bin/n98-magerun.phar > ${VERBOSE}
     chmod +x ~/bin/n98-magerun.phar
 fi
 
@@ -591,21 +591,21 @@ fi
 if [ ! -d ~/.n98-magerun/modules/environment ]
 then
     echo Installing n98 module: lenlorijn/environment
-    git clone git@github.com:lenlorijn/environment.git ~/.n98-magerun/modules/environment > $VERBOSE 2>&1
+    git clone git@github.com:lenlorijn/environment.git ~/.n98-magerun/modules/environment > ${VERBOSE} 2>&1
     cd ~/.n98-magerun/modules/environment
-    php ~/bin/composer.phar install --no-dev > $VERBOSE 2>&1
+    php ~/bin/composer.phar install --no-dev > ${VERBOSE} 2>&1
     cd - > /dev/null
 fi
 
 if [ ! -d ~/.n98-magerun/modules/mpmd ]
 then
     echo Installing n98 module: Magento Project Mess Detector
-    git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd > $VERBOSE 2>&1
+    git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd > ${VERBOSE} 2>&1
 fi
 
-if [ "$EXTRA_BTSEC" -eq "1" ]
+if [ "${EXTRA_BTSEC}" -eq "1" ]
 then
-    sudo apt-get install --yes --force-yes install indicator-systemtray-unity blueproximity > $VERBOSE
+    sudo apt-get install --yes --force-yes install indicator-systemtray-unity blueproximity > ${VERBOSE}
 fi
 
 
@@ -613,28 +613,28 @@ echo Setting pretty hostname
 sudo sh -c 'cat > /etc/machine-info' << EOT
 PRETTY_HOSTNAME=$(hostname)
 EOT
-sudo rfkill unblock bluetooth > $VERBOSE
-sudo service bluetooth restart > $VERBOSE
-sudo hciconfig hci0 name $(hostname) > $VERBOSE 2>&1
+sudo rfkill unblock bluetooth > ${VERBOSE}
+sudo service bluetooth restart > ${VERBOSE}
+sudo hciconfig hci0 name $(hostname) > ${VERBOSE} 2>&1
 
 echo Disabling services
 for service in samba smbd nmbd
 do
-    sudo update-rc.d $service remove
-    sudo service $service stop
+    sudo update-rc.d ${service} remove
+    sudo service ${service} stop
 done
 
 echo Restarting services
 for service in bluetooth
 do
-    sudo service $service restart
+    sudo service ${service} restart
 done
 
 echo Cleaning up installation
 
-sudo apt-get autoclean --yes > $VERBOSE
-sudo apt-get clean --yes > $VERBOSE
-sudo apt-get autoremove --yes > $VERBOSE
+sudo apt-get autoclean --yes > ${VERBOSE}
+sudo apt-get clean --yes > ${VERBOSE}
+sudo apt-get autoremove --yes > ${VERBOSE}
 
 echo <<EOF
 After installing PhpStorm add the following lines to phpstorm-path/bin/phpstorm64.vmoptions:
@@ -643,7 +643,7 @@ After installing PhpStorm add the following lines to phpstorm-path/bin/phpstorm6
 -Dawt.useSystemAAFontSettings=on
 EOF
 
-if [ "$EXTRA_APPS" -eq "1" ]
+if [ "${EXTRA_APPS}" -eq "1" ]
 then
     echo <<EOF
 Reboot is required to automatically start zsh
