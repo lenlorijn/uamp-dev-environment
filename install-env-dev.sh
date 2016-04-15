@@ -427,6 +427,8 @@ else
     PHP_PATH="/etc/php/7.0"
 fi
 
+MYSQLPWD=$(grep password ~/.my.cnf | head -n1 | sed 's/^.*password.*"\([^"]*\)"$/\1/')
+
 sudo sh -c "cat > ${PHP_PATH}/mods-available/custom.ini" << EOF
 [PHP]
 short_open_tag = On
@@ -440,6 +442,11 @@ sendmail_path = /usr/bin/env $(which catchmail) -f test@local.dev
 
 [Date]
 date.timezone = Europe/Amsterdam
+
+[MySQLi]
+mysqli.default_host = localhost
+mysqli.default_user = ${USER}
+mysqli.default_pw = "${MYSQLPWD}"
 
 [Xdebug]
 xdebug.remote_enable=1
