@@ -134,6 +134,7 @@ else
     PACKAGES="${PACKAGES} php7.0-intl php7.0-mcrypt php7.0-mysql php7.0-odbc"
     PACKAGES="${PACKAGES} php7.0-readline php7.0-tidy php7.0-xsl php7.0-sybase"
     PACKAGES="${PACKAGES} php-redis php-mongodb php-imagick php-xdebug"
+    PACKAGES="${PACKAGES} php7.0-mbstring php7.0-soap"
 fi
 sudo apt-get --yes --force-yes install mysql-server
 sudo apt-get --yes --force-yes install ${PACKAGES} > ${VERBOSE}
