@@ -4,6 +4,7 @@ EXTRA_APPS=0
 EXTRA_THEME=0
 EXTRA_SHELL=0
 EXTRA_BTSEC=0
+EXTRA_MAGENTO=0
 VERBOSE=/dev/null
 VERSION=`lsb_release -r | sed 's/Release:[^0-9]*\([0-9]*\)\..*/\1/'`
 
@@ -17,6 +18,7 @@ Options:
   -h|--help   Show this help message
   -apps       Installs extra apps like Gimp and MySQL Workbench
   -fancy-zsh  Installs zsh with a bunch of extras
+  -magento    Installs Magento related stuff
   -theme      Installs Numix circle theme
   -v          Shows verbose output
 EOT
@@ -44,6 +46,9 @@ do
             ;;
         -fancy-zsh)
             EXTRA_SHELL=1
+            ;;
+        -magento)
+            EXTRA_MAGENTO=1
             ;;
         -theme)
             EXTRA_THEME=1
@@ -600,40 +605,43 @@ then
     curl -sS https://getcomposer.org/installer | php -- --install-dir=${TMP}/bin > ${VERBOSE}
 fi
 
-echo Installing n98 magerun
-if [ ! -f ~/bin/n98-magerun.phar ]
+if [ "${EXTRA_MAGENTO}" -eq "1" ]
 then
-    wget http://files.magerun.net/n98-magerun-latest.phar -O ~/bin/n98-magerun.phar > ${VERBOSE}
-    chmod +x ~/bin/n98-magerun.phar
-fi
+    echo Installing n98 magerun
+    if [ ! -f ~/bin/n98-magerun.phar ]
+    then
+        wget http://files.magerun.net/n98-magerun-latest.phar -O ~/bin/n98-magerun.phar > ${VERBOSE}
+        chmod +x ~/bin/n98-magerun.phar
+    fi
 
-if [ ! -d ~/.n98-magerun/modules/ ]
-then
-    mkdir -p ~/.n98-magerun/modules/
-fi
+    if [ ! -d ~/.n98-magerun/modules/ ]
+    then
+        mkdir -p ~/.n98-magerun/modules/
+    fi
 
-#if [ ! -d ~/.n98-magerun/modules/mct-dev-tools ]
-#then
-#    echo Installing n98 module: mediact/mct-dev-tools
-#    git clone git@mediact.git.beanstalkapp.com:/mediact/mct-dev-tools.git ~/.n98-magerun/modules/mct-dev-tools > $VERBOSE 2>&1
-#    cd ~/.n98-magerun/modules/mct-dev-tools
-#    make composer.lock > $VERBOSE 2>&1
-#    cd - > /dev/null
-#fi
+    #if [ ! -d ~/.n98-magerun/modules/mct-dev-tools ]
+    #then
+    #    echo Installing n98 module: mediact/mct-dev-tools
+    #    git clone git@mediact.git.beanstalkapp.com:/mediact/mct-dev-tools.git ~/.n98-magerun/modules/mct-dev-tools > $VERBOSE 2>&1
+    #    cd ~/.n98-magerun/modules/mct-dev-tools
+    #    make composer.lock > $VERBOSE 2>&1
+    #    cd - > /dev/null
+    #fi
 
-if [ ! -d ~/.n98-magerun/modules/environment ]
-then
-    echo Installing n98 module: lenlorijn/environment
-    git clone git@github.com:lenlorijn/environment.git ~/.n98-magerun/modules/environment > ${VERBOSE} 2>&1
-    cd ~/.n98-magerun/modules/environment
-    php ~/bin/composer.phar install --no-dev > ${VERBOSE} 2>&1
-    cd - > /dev/null
-fi
+    if [ ! -d ~/.n98-magerun/modules/environment ]
+    then
+        echo Installing n98 module: lenlorijn/environment
+        git clone git@github.com:lenlorijn/environment.git ~/.n98-magerun/modules/environment > ${VERBOSE} 2>&1
+        cd ~/.n98-magerun/modules/environment
+        php ~/bin/composer.phar install --no-dev > ${VERBOSE} 2>&1
+        cd - > /dev/null
+    fi
 
-if [ ! -d ~/.n98-magerun/modules/mpmd ]
-then
-    echo Installing n98 module: Magento Project Mess Detector
-    git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd > ${VERBOSE} 2>&1
+    if [ ! -d ~/.n98-magerun/modules/mpmd ]
+    then
+        echo Installing n98 module: Magento Project Mess Detector
+        git clone git@github.com:AOEpeople/mpmd.git ~/.n98-magerun/modules/mpmd > ${VERBOSE} 2>&1
+    fi
 fi
 
 if [ "${EXTRA_BTSEC}" -eq "1" ]
