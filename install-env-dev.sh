@@ -491,11 +491,10 @@ fi
 
 for mod in ${PHP_MODULES}
 do
-    if [ `php -m | grep ${mod} | wc -l` -eq "0" ]
+    if [ `php -m | grep "${mod}" | wc -l` -eq "0" ]
     then
-        if [ "${mod}" -eq "xdebug" ]
+        if [ "${mod}" = "xdebug" ]
         then
-            echo NOT DOING XDEBUG
             continue
         fi
         if [ "${VERSION}" -lt "16" ]
