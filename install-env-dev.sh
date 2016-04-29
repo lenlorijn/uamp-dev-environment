@@ -123,7 +123,7 @@ PACKAGES="${PACKAGES} mtpfs network-manager-openvpn nodejs-legacy npm"
 PACKAGES="${PACKAGES} oracle-java8-installer openvpn php-codesniffer"
 PACKAGES="${PACKAGES} php-invoker phpmd php-pear php-timer phpunit python"
 PACKAGES="${PACKAGES} python-pip redis-server redis-tools ruby ruby-dev"
-PACKAGES="${PACKAGES} software-properties-common vim wget whois"
+PACKAGES="${PACKAGES} software-properties-common vim wget whois screen"
 
 if [ "${VERSION}" -lt "16" ]
 then
