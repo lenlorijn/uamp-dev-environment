@@ -63,10 +63,6 @@ do
     shift
 done
 
-echo Removing useless folders
-
-rm -rf ~/Public ~/Templates ~/Videos ~/Music ~/Examples
-
 echo Creating useful folders
 for dir in bin
 do
