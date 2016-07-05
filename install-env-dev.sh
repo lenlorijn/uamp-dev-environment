@@ -85,6 +85,8 @@ then
 fi
 sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 
+sudo add-apt-repository --yes ppa:ondrej/php
+
 if [ "${EXTRA_BTSEC}" -eq "1" ]
 then
     sudo add-apt-repository --yes ppa:fixnix/indicator-systemtray-unity
