@@ -82,6 +82,7 @@ fi
 sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
 
 sudo add-apt-repository --yes ppa:ondrej/php
+sudo add-apt-repository --yes ppa:ondrej/php-zts
 
 if [ "${EXTRA_BTSEC}" -eq "1" ]
 then
@@ -136,12 +137,22 @@ else
     PACKAGES="${PACKAGES} php7.0-dev php7.0-gd php7.0-common php7.0-json"
     PACKAGES="${PACKAGES} php7.0-intl php7.0-mcrypt php7.0-mysql php7.0-odbc"
     PACKAGES="${PACKAGES} php7.0-readline php7.0-tidy php7.0-xsl php7.0-sybase"
-    PACKAGES="${PACKAGES} php-redis php-mongodb php-imagick php-xdebug"
     PACKAGES="${PACKAGES} php7.0-mbstring php7.0-soap php7.0-zip php7.0-bcmath"
     PACKAGES="${PACKAGES} php7.0-sqlite3"
+    # also install ZTS PHP
+    PACKAGES="${PACKAGES} libapache2-mod-php7.0-zts php7.0-zts php7.0-zts-cli php7.0-zts-curl"
+    PACKAGES="${PACKAGES} php7.0-zts-dev php7.0-zts-gd php7.0-zts-common php7.0-zts-json"
+    PACKAGES="${PACKAGES} php7.0-zts-intl php7.0-zts-mcrypt php7.0-zts-mysql php7.0-zts-odbc"
+    PACKAGES="${PACKAGES} php7.0-zts-readline php7.0-zts-tidy php7.0-zts-xsl php7.0-zts-sybase"
+    PACKAGES="${PACKAGES} php7.0-zts-mbstring php7.0-zts-soap php7.0-zts-zip php7.0-zts-bcmath"
+    PACKAGES="${PACKAGES} php7.0-zts-sqlite3"
+    # general php mods
+    PACKAGES="${PACKAGES} php-redis php-mongodb php-imagick php-xdebug"
 fi
 sudo apt-get --yes --force-yes install mysql-server
 sudo apt-get --yes --force-yes install ${PACKAGES} > ${VERBOSE}
+
+sudo update-alternatives --set php /usr/bin/php7.0
 
 if [ ! -f ~/.my.cnf ]
 then
