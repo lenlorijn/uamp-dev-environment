@@ -133,6 +133,8 @@ then
     PACKAGES="${PACKAGES} php5-sybase php5-tidy php5-xsl php5-imagick"
     PACKAGES="${PACKAGES} php5-xdebug"
 else
+    PACKAGES="${PACKAGES} network-manager-openvpn network-manager-vpnc"
+    PACKAGES="${PACKAGES} network-manager-openvpn-gnome network-manager-pptp"
     PACKAGES="${PACKAGES} libapache2-mod-php7.0 php7.0 php7.0-cli php7.0-curl"
     PACKAGES="${PACKAGES} php7.0-dev php7.0-gd php7.0-common php7.0-json"
     PACKAGES="${PACKAGES} php7.0-intl php7.0-mcrypt php7.0-mysql php7.0-odbc"
