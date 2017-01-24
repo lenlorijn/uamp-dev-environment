@@ -614,6 +614,9 @@ if [ ! -f ~/bin/composer.phar ]
 then
     TMP=~
     curl -sS https://getcomposer.org/installer | php -- --install-dir=${TMP}/bin > ${VERBOSE}
+    composer global config repositories.mediact composer https://composer.mediact.nl
+    composer global require mediact/coding-standard
+    ~/.composer/vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths ~/.composer/vendor/mediact/coding-standard/src
 fi
 
 if [ "${EXTRA_MAGENTO}" -eq "1" ]
